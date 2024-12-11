@@ -41,7 +41,6 @@ const getCSS = ({ spacing, justify, hyphenate }) => `
         display: none;
     }
 `
-
 const $ = document.querySelector.bind(document)
 
 const locales = 'en'

@@ -124,7 +124,6 @@ export const makeBook = async file => {
         }
     }
     if (!book) throw new UnsupportedTypeError('File type not supported')
-    console.log("book", book)
     return book
 }
 

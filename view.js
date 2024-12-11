@@ -278,7 +278,7 @@ export class View extends HTMLElement {
 
         this.isFixedLayout = this.book.rendition?.layout === 'pre-paginated'
         if (this.isFixedLayout) {
-            await import('./utils/fixed-layout.js')
+            await import('./ui/fixed-layout.js')
             this.renderer = document.createElement('foliate-fxl')
         } else {
             await import('./ui/paginator.js')

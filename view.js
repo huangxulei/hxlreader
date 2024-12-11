@@ -1,7 +1,7 @@
-import * as CFI from './epubcfi.js'
-import { TOCProgress, SectionProgress } from './progress.js'
-import { Overlayer } from './overlayer.js'
-import { textWalker } from './text-walker.js'
+import * as CFI from './utils/epubcfi.js'
+import { TOCProgress, SectionProgress } from './ui/progress.js'
+import { Overlayer } from './ui/overlayer.js'
+import { textWalker } from './ui/text-walker.js'
 
 const SEARCH_PREFIX = 'foliate-search:'
 
@@ -26,18 +26,22 @@ const isFB2 = ({ name, type }) =>
 const isFBZ = ({ name, type }) =>
     type === 'application/x-zip-compressed-fb2'
     || name.endsWith('.fb2.zip') || name.endsWith('.fbz')
-
+//解析epub文件
 const makeZipLoader = async file => {
     const { configure, ZipReader, BlobReader, TextWriter, BlobWriter } =
         await import('./vendor/zip.js')
     configure({ useWebWorkers: false })
     const reader = new ZipReader(new BlobReader(file))
+    //所有文件和文件夹
     const entries = await reader.getEntries()
+    // 转换map
     const map = new Map(entries.map(entry => [entry.filename, entry]))
     const load = f => (name, ...args) =>
         map.has(name) ? f(map.get(name), ...args) : null
+    // 这几个是代码
     const loadText = load(entry => entry.getData(new TextWriter()))
     const loadBlob = load((entry, type) => entry.getData(new BlobWriter(type)))
+    //获取
     const getSize = name => map.get(name)?.uncompressedSize ?? 0
     return { entries, loadText, loadBlob, getSize }
 }
@@ -75,51 +79,52 @@ const fetchFile = async url => {
         `${res.status} ${res.statusText}`, { cause: res })
     return new File([await res.blob()], new URL(res.url).pathname)
 }
-
+//解析文件
 export const makeBook = async file => {
-
+    //假如是一个url
     if (typeof file === 'string') file = await fetchFile(file)
     let book
     if (file.isDirectory) {
         const loader = await makeDirectoryLoader(file)
-        const { EPUB } = await import('./epub.js')
+        const { EPUB } = await import('./utils/epub.js')
         book = await new EPUB(loader).init()
     }
     else if (!file.size) throw new NotFoundError('File not found')
-    else if (await isZip(file)) {
+    else if (await isZip(file)) {//epub文件
         const loader = await makeZipLoader(file)
         if (isCBZ(file)) {
-            const { makeComicBook } = await import('./comic-book.js')
+            const { makeComicBook } = await import('./utils/comic-book.js')
             book = makeComicBook(loader, file)
         }
         else if (isFBZ(file)) {
-            const { makeFB2 } = await import('./fb2.js')
+            const { makeFB2 } = await import('./utils/fb2.js')
             const { entries } = loader
             const entry = entries.find(entry => entry.filename.endsWith('.fb2'))
             const blob = await loader.loadBlob((entry ?? entries[0]).filename)
             book = await makeFB2(blob)
         }
         else {
-            const { EPUB } = await import('./epub.js')
+            const { EPUB } = await import('./utils/epub.js')
             book = await new EPUB(loader).init()
         }
     }
     else if (await isPDF(file)) {
-        const { makePDF } = await import('./pdf.js')
+        const { makePDF } = await import('./utils/pdf.js')
         book = await makePDF(file)
     }
     else {
-        const { isMOBI, MOBI } = await import('./mobi.js')
+        const { isMOBI, MOBI } = await import('./utils/mobi.js')
         if (await isMOBI(file)) {
             const fflate = await import('./vendor/fflate.js')
             book = await new MOBI({ unzlib: fflate.unzlibSync }).open(file)
         }
         else if (isFB2(file)) {
-            const { makeFB2 } = await import('./fb2.js')
+            const { makeFB2 } = await import('./utils/fb2.js')
             book = await makeFB2(file)
         }
     }
     if (!book) throw new UnsupportedTypeError('File type not supported')
+    console.log("book", book)
     return book
 }
 
@@ -229,9 +234,10 @@ export class View extends HTMLElement {
             this.renderer.goTo(resolved)
         })
     }
+    //加载文件
     async open(book) {
-        // 判断book 是否为字符串 函数类型
-        if (typeof book === 'string'
+        //解析文件
+        if (typeof book === 'string'//url路径
             || typeof book.arrayBuffer === 'function'
             || book.isDirectory) book = await makeBook(book)
         this.book = book
@@ -255,10 +261,10 @@ export class View extends HTMLElement {
 
         this.isFixedLayout = this.book.rendition?.layout === 'pre-paginated'
         if (this.isFixedLayout) {
-            await import('./fixed-layout.js')
+            await import('./utils/fixed-layout.js')
             this.renderer = document.createElement('foliate-fxl')
         } else {
-            await import('./paginator.js')
+            await import('./ui/paginator.js')
             this.renderer = document.createElement('foliate-paginator')
         }
         this.renderer.setAttribute('exportparts', 'head,foot,filter')
@@ -544,7 +550,7 @@ export class View extends HTMLElement {
     }
     async * search(opts) {
         this.clearSearch()
-        const { searchMatcher } = await import('./search.js')
+        const { searchMatcher } = await import('./ui/search.js')
         const { query, index } = opts
         const matcher = searchMatcher(textWalker,
             { defaultLocale: this.language, ...opts })
@@ -594,5 +600,5 @@ export class View extends HTMLElement {
         return this.mediaOverlay.start(index)
     }
 }
-//自定义标签
+//自定义的内容页
 customElements.define('foliate-view', View)

@@ -82,7 +82,7 @@ const getContent = el => {
             .replaceAll('&lt;', '<')
             .replaceAll('&gt;', '>')
             .replaceAll('&amp;', '&')
-        : el.textContent
+            : el.textContent
     return { value, type }
 }
 

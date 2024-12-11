@@ -1,7 +1,7 @@
 import './view.js'
 import { createTOCView } from './ui/tree.js'
 import { createMenu } from './ui/menu.js'
-import { Overlayer } from './overlayer.js'
+import { Overlayer } from './ui/overlayer.js'
 
 const getCSS = ({ spacing, justify, hyphenate }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
@@ -63,7 +63,7 @@ const formatContributor = contributor => Array.isArray(contributor)
     : formatOneContributor(contributor)
 
 class Reader {
-    #tocView
+    #tocView//目录页面
     style = {
         spacing: 1.4,
         justify: true,
@@ -71,17 +71,24 @@ class Reader {
     }
     annotations = new Map()
     annotationsByValue = new Map()
+    //关闭目录和遮罩层
     closeSideBar() {
         $('#dimming-overlay').classList.remove('show')
         $('#side-bar').classList.remove('show')
     }
+    //左右两边按钮设置
     constructor() {
+        //目录按钮添加点击事件
+        // .classList 元素的类名
         $('#side-bar-button').addEventListener('click', () => {
+            //添加class="show" 显示遮罩层 
             $('#dimming-overlay').classList.add('show')
+            //添加class="show" 显示左边显示目录 
             $('#side-bar').classList.add('show')
         })
+        //点击遮罩层的时候 关闭遮罩层和目录
         $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
-
+        //右上角设置
         const menu = createMenu([
             {
                 name: 'layout',
@@ -104,6 +111,7 @@ class Reader {
         menu.groups.layout.select('paginated')
     }
     async open(file) {
+        //显示内容页面
         this.view = document.createElement('foliate-view')
         document.body.append(this.view)
         await this.view.open(file)
@@ -152,7 +160,7 @@ class Reader {
         // load and show highlights embedded in the file by Calibre
         const bookmarks = await book.getCalibreBookmarks?.()
         if (bookmarks) {
-            const { fromCalibreHighlight } = await import('./epubcfi.js')
+            const { fromCalibreHighlight } = await import('./utils/epubcfi.js')
             for (const obj of bookmarks) {
                 if (obj.type === 'highlight') {
                     const value = fromCalibreHighlight(obj)
@@ -205,7 +213,9 @@ class Reader {
 }
 //打开文件
 const open = async file => {
-    document.body.removeChild($('#drop-target'))//移除添加文件的布局
+    //移除添加文件的布局
+    document.body.removeChild($('#drop-target'))
+
     const reader = new Reader()
     globalThis.reader = reader
     await reader.open(file)
@@ -225,12 +235,10 @@ const dropTarget = $('#drop-target')
 dropTarget.addEventListener('drop', dropHandler)
 dropTarget.addEventListener('dragover', dragOverHandler)
 
+//添加按键事件
 $('#file-input').addEventListener('change', e => {
     open(e.target.files[0]).catch(e => console.error(e))//打开文件
-
 })
-
-//添加按键事件
 $('#file-button').addEventListener('click', () => $('#file-input').click())
 
 const params = new URLSearchParams(location.search)

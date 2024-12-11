@@ -1,0 +1,153 @@
+{
+    "parser": {},
+    "serializer": {},
+    "mobi": {
+        "pdb": {
+            "name": "ACR\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+            "type": "BOOK",
+            "creator": "MOBI",
+            "numRecords": 2606
+        },
+        "headers": {
+            "palmdoc": {
+                "compression": 2,
+                "numTextRecords": 1238,
+                "recordSize": 4096,
+                "encryption": 0
+            },
+            "mobi": {
+                "magic": "MOBI",
+                "length": 264,
+                "type": 2,
+                "encoding": 65001,
+                "uid": 3885553495,
+                "version": 8,
+                "titleOffset": 672,
+                "titleLength": 9,
+                "localeRegion": 8,
+                "localeLanguage": 4,
+                "resourceStart": 1250,
+                "huffcdic": 0,
+                "numHuffcdic": 0,
+                "exthFlag": 80,
+                "trailingFlags": 3,
+                "indx": 1247,
+                "title": {},
+                "language": "zh-CN"
+            },
+            "exth": {
+                "date": "2014-09-18",
+                "creator": [
+                    "郑证因"
+                ],
+                "publisher": "威锋出版社",
+                "contributor": [
+                    "田戈"
+                ],
+                "language": [
+                    "zh-CN"
+                ],
+                "coverURI": "kindle:embed:0004",
+                "numResources": 0,
+                "coverOffset": 0,
+                "thumbnailOffset": 4
+            },
+            "kf8": {
+                "resourceStart": 1250,
+                "fdst": 1250,
+                "numFdst": 2,
+                "frag": 1239,
+                "skel": 1242,
+                "guide": 1244
+            }
+        }
+    },
+    "sections": [
+        {
+            "id": 0,
+            "size": 533
+        },
+        {
+            "id": 1,
+            "size": 836
+        },
+        {
+            "id": 2,
+            "size": 23662
+        },
+        {
+            "id": 3,
+            "size": 1043
+        },
+        {
+            "id": 4,
+            "size": 1047
+        },
+        {
+            "id": 5,
+            "size": 1408
+        }
+    ],
+    "toc": [
+        {
+            "label": "封面",
+            "href": "kindle:pos:fid:0000:off:0000000000",
+            "id": 0
+        },
+        {
+            "label": "扉页",
+            "href": "kindle:pos:fid:0001:off:0000000000",
+            "id": 1
+        },
+        {
+            "label": "目录",
+            "href": "kindle:pos:fid:0002:off:0000000000",
+            "id": 2
+        },
+        {
+            "label": "编辑推荐",
+            "href": "kindle:pos:fid:0007:off:0000000000",
+            "id": 3
+        },
+        {
+            "label": "内容推荐",
+            "href": "kindle:pos:fid:0008:off:0000000000",
+            "id": 4
+        },
+        {
+            "label": "作者简介",
+            "href": "kindle:pos:fid:0009:off:0000000000",
+            "id": 5
+        }
+    ],
+    "landmarks": [
+        {
+            "label": "Table of Contents",
+            "type": [
+                "toc"
+            ],
+            "href": "kindle:pos:fid:0002:off:0000000000"
+        }
+    ],
+    "rendition": {
+        "layout": "reflowable",
+        "viewport": {}
+    },
+    "metadata": {
+        "identifier": "3885553495",
+        "title": "鹰爪王",
+        "author": [
+            "郑证因"
+        ],
+        "publisher": "威锋出版社",
+        "language": [
+            "zh-CN"
+        ],
+        "published": "2014-09-18",
+        "description": "",
+        "rights": "",
+        "contributor": [
+            "田戈"
+        ]
+    }
+}

@@ -20,8 +20,13 @@ export class TOCProgress {
         assignIDs(toc)
         const items = flatten(toc)
         const grouped = new Map()
+        /**
+         *  href: "text/part0006.html", id: 2, 
+         *  label: "前言：当意志与命运逆行，你一生的故事",subitems: null
+         */
         for (const [i, item] of items.entries()) {
             const [id, fragment] = await splitHref(item?.href) ?? []
+            //id text/part0006.html 
             const value = { fragment, item }
             if (grouped.has(id)) grouped.get(id).items.push(value)
             else grouped.set(id, { prev: items[i - 1], items: [value] })

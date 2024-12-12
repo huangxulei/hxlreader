@@ -241,7 +241,6 @@ export class View extends HTMLElement {
             || book.isDirectory) book = await makeBook(book)
         this.book = book
         this.language = languageInfo(book.metadata?.language)
-        console.log(book)
         /**
          *  epub文件
          *  splitTOCHref(href) { 
@@ -275,21 +274,25 @@ export class View extends HTMLElement {
                 toc: book.pageList ?? [], ids, splitHref, getFragment
             })
         }
+        console.log("book:", book)
 
         this.isFixedLayout = this.book.rendition?.layout === 'pre-paginated'
         if (this.isFixedLayout) {
-            await import('./utils/fixed-layout.js')
+            await import('./ui/fixed-layout.js')
             this.renderer = document.createElement('foliate-fxl')
         } else {
             await import('./ui/paginator.js')
             this.renderer = document.createElement('foliate-paginator')
         }
         this.renderer.setAttribute('exportparts', 'head,foot,filter')
-        this.renderer.addEventListener('load', e => this.#onLoad(e.detail))
+        this.renderer.addEventListener('load', e => {
+            this.#onLoad(e.detail)
+        }
+        )
         this.renderer.addEventListener('relocate', e => this.#onRelocate(e.detail))
         this.renderer.addEventListener('create-overlayer', e =>
             e.detail.attach(this.#createOverlayer(e.detail)))
-        this.renderer.open(book)
+        this.renderer.open(book)//这里开始
         this.#root.append(this.renderer)
 
         if (book.sections.some(section => section.mediaOverlay)) {

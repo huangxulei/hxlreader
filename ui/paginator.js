@@ -203,8 +203,8 @@ class View {
     #iframe = document.createElement('iframe')
     #contentRange = document.createRange()
     #overlayer
-    #vertical = false
-    #rtl = false
+    #vertical = false // 是否垂直 
+    #rtl = false// 右向左
     #column = true
     #size
     #layout = {}
@@ -350,7 +350,9 @@ class View {
         }
     }
     expand() {
-        const { documentElement } = this.document
+        // this.#column = true 
+        // this.#vertical false
+        const { documentElement } = this.document//iframe 
         if (this.#column) {
             const side = this.#vertical ? 'height' : 'width'
             const otherSide = this.#vertical ? 'width' : 'height'
@@ -725,6 +727,7 @@ export class Paginator extends HTMLElement {
         return { height, width, margin, gap, columnWidth }
     }
     render() {
+        console.log("paginator.js - render")
         if (!this.#view) return
         this.#view.render(this.#beforeRender({
             vertical: this.#vertical,

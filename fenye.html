@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>页面分页</title>
+        <style type="text/css">
+            * {
+                font-size: 10.2pt;
+                font-family: tahoma;
+                line-height: 150%;
+            }
+            .divContent {
+                border: 1px solid red;
+                background-color: #ffd2d3;
+                width: 500px;
+                word-break: break-all;
+                margin: 10px 0px 10px;
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>标题</h1>
+        <div id="divPagenation"></div>
+        <div id="divContent"></div>
+
+        <script type="text/javascript">
+            s =
+                "<p>女老师竭力向孩子们证明，学习好功课的重要性。 </p><img src='/login/image/password.png' /><p>她说：“牛顿坐在树下，眼睛盯着树在思考，这时，<img src='/login/image/password3.png' />有一个苹果落在他的头上，于是他发现了万有引力定律，孩子们，你们想想看，做一位伟大的科学家多么好，多么神气啊，要想做到这一点，就必须好好学习。” </p><p>“班上一个调皮鬼对此并不满意。他说：“兴许是这样，可是，假如他坐在学校里，埋头书本，那他就什么也发现不了啦。” </p><p>女老师竭力向孩子们证明，学习好功课的重要性。 </p><p>她说：“牛顿坐在树下，眼睛盯着树在思考，这时，有一个苹果落在他的头上，于是他发现了万有引力定律，孩子们，你们想想看，做一位伟大的科学家多么好，多么神气啊，要想做到这一点，就必须好好学习。” </p><p>“班上一个调皮鬼对此并不满意。他说：“兴许是这样，可是，假如他坐在学校里，埋头书本，那他就什么也发现不了啦。” </p><p>女老师竭力向孩子们证明，学习好功课的重要性。 </p><p>她说：“牛顿坐在树下，眼睛盯着树在思考，这时，有一个苹果落在他的头上，于是他发现了万有引力定律，孩子们，你们想想看，做一位伟大的科学家多么好，多么神气啊，要想做到这一点，就必须好好学习。” </p><p>“班上一个调皮鬼对此并不满意。他说：“兴许是这样，可是，假如他坐在学校里，埋头书本，那他就什么也发现不了啦。” </p><p>女老师竭力向孩子们证明，学习好功课的重要性。 </p><p>她说：“牛顿坐在树下，眼睛盯着树在思考，这时，有一个苹果落在他的头上，于是他发现了万有引力定律，孩子们，你们想想看，做一位伟大的科学家多么好，多么神气啊，要想做到这一点，就必须好好学习。” </p><p>“班上一个调皮鬼对此并不满意。他说：“兴许是这样，可是，假如他坐在学校里，埋头书本，那他就什么也发现不了啦。” </p><p>女老师竭力向孩子们证明，学习好功课的重要性。 </p><p>她说：“牛顿坐在树下，眼睛盯着树在思考，这时，有一个苹果落在他的头上，于是他发现了万有引力定律，孩子们，你们想想看，做一位伟大的科学家多么好，多么神气啊，要想做到这一点，就必须好好学习。” </p><p>“班上一个调皮鬼对此并不满意。他说：“兴许是这样，可是，假如他坐在学校里，埋头书本，那他就什么也发现不了啦。” </p>"
+
+            //对img标签进行匹配
+            var imgReg = /(<img\s+src='\S+'\s*(\/)?>)/gi
+            matchContent = s.match(imgReg)
+            imgContent = s
+            if (imgReg.test(s)) {
+                //将img标签替换为*
+                imgContent = s.replace(imgReg, "*")
+            }
+
+            // 封装DHTMLpagenation
+            function DHTMLpagenation(content) {
+                this.content = content // 内容
+                this.contentLength = imgContent.length // 内容长度
+                this.pageSizeCount // 总页数
+                this.perpageLength = 100 //default perpage byte length.
+                this.currentPage = 1 // 起始页为第1页
+                //this.regularExp=/.+[\?\&]{1}page=(\d+)/;
+                this.regularExp = /\d+/ // 建立正则表达式，匹配数字型字符串。
+
+                this.divDisplayContent
+                this.contentStyle = null
+                this.strDisplayContent = ""
+                this.divDisplayPagenation
+                this.strDisplayPagenation = ""
+
+                // 把第二个参数赋给perpageLength;
+                arguments.length == 2 ? (perpageLength = arguments[1]) : ""
+
+                try {
+                    //创建要显示的DIV
+                    divExecuteTime = document.createElement("DIV")
+                    document.body.appendChild(divExecuteTime)
+                } catch (e) {}
+
+                // 得到divPagenation容器。
+                if (document.getElementById("divPagenation")) {
+                    divDisplayPagenation =
+                        document.getElementById("divPagenation")
+                } else {
+                    try {
+                        //创建分页信息
+                        divDisplayPagenation = document.createElement("DIV")
+                        divDisplayPagenation.id = "divPagenation"
+                        document.body.appendChild(divDisplayPagenation)
+                    } catch (e) {
+                        return false
+                    }
+                }
+
+                // 得到divContent容器
+                if (document.getElementById("divContent")) {
+                    divDisplayContent = document.getElementById("divContent")
+                } else {
+                    try {
+                        //创建每页显示内容的消息的DIV
+                        divDisplayContent = document.createElement("DIV")
+                        divDisplayContent.id = "divContent"
+                        document.body.appendChild(divDisplayContent)
+                    } catch (e) {
+                        return false
+                    }
+                }
+
+                DHTMLpagenation.initialize()
+                return this
+            }
+
+            //初始化分页；
+            //包括把加入CSS，检查是否需要分页
+            DHTMLpagenation.initialize = function () {
+                divDisplayContent.className =
+                    contentStyle != null ? contentStyle : "divContent"
+
+                if (contentLength <= perpageLength) {
+                    strDisplayContent = content
+                    divDisplayContent.innerHTML = strDisplayContent
+                    return null
+                }
+
+                pageSizeCount = Math.ceil(contentLength / perpageLength)
+
+                DHTMLpagenation.goto(currentPage)
+
+                DHTMLpagenation.displayContent()
+            }
+
+            //显示分页栏
+            DHTMLpagenation.displayPage = function () {
+                strDisplayPagenation = "分页："
+
+                if (currentPage && currentPage != 1) {
+                    strDisplayPagenation +=
+                        '<a href="javascript:void(0)" onclick="DHTMLpagenation.previous()">上一页</a>  '
+                } else {
+                    strDisplayPagenation += "上一页  "
+                }
+
+                for (var i = 1; i <= pageSizeCount; i++) {
+                    if (i != currentPage) {
+                        strDisplayPagenation +=
+                            '<a href="javascript:void(0)" onclick="DHTMLpagenation.goto(' +
+                            i +
+                            ');">' +
+                            i +
+                            "</a>  "
+                    } else {
+                        strDisplayPagenation += i + "  "
+                    }
+                }
+
+                if (currentPage && currentPage != pageSizeCount) {
+                    strDisplayPagenation +=
+                        '<a href="javascript:void(0)" onclick="DHTMLpagenation.next()">下一页</a>  '
+                } else {
+                    strDisplayPagenation += "下一页  "
+                }
+
+                strDisplayPagenation +=
+                    "共 " +
+                    pageSizeCount +
+                    " 页，每页" +
+                    perpageLength +
+                    " 字符，调整字符数：<input type='text' value='" +
+                    perpageLength +
+                    "' id='ctlPerpageLength' /><input type='button' value='确定' onclick='DHTMLpagenation.change()' />"
+
+                divDisplayPagenation.innerHTML = strDisplayPagenation
+            }
+
+            //上一页
+            DHTMLpagenation.previous = function () {
+                DHTMLpagenation.goto(currentPage - 1)
+            }
+
+            //下一页
+            DHTMLpagenation.next = function () {
+                DHTMLpagenation.goto(currentPage + 1)
+            }
+
+            //跳转至某一页
+            DHTMLpagenation.goto = function (iCurrentPage) {
+                startime = new Date()
+                if (regularExp.test(iCurrentPage)) {
+                    currentPage = iCurrentPage
+
+                    var tempContent = ""
+
+                    //获取当前的内容 里面包含 *
+                    var currentContent = imgContent.substr(
+                        (currentPage - 1) * perpageLength,
+                        perpageLength
+                    )
+
+                    tempContent = currentContent
+
+                    //当前页是否有 * 获取最后一个 * 的位置
+                    var indexOf = currentContent.indexOf("*")
+
+                    if (indexOf >= 0) {
+                        //获取从开始位置到当前页位置的内容
+                        var beginToEndContent = imgContent.substr(
+                            0,
+                            currentPage * perpageLength
+                        )
+
+                        //获取开始到当前页位置的内容 中的 * 的最后的下标
+                        var reCount = beginToEndContent.split("*").length - 1
+
+                        var contentArray = currentContent.split("*")
+
+                        tempContent = replaceStr(
+                            contentArray,
+                            reCount,
+                            matchContent
+                        )
+                    }
+                    //                else
+                    //                {
+                    //                    tempContent=imgContent.substr((currentPage-1)*perpageLength,perpageLength);
+                    //                }
+
+                    strDisplayContent = tempContent
+                } else {
+                    alert("页面参数错误")
+                }
+                DHTMLpagenation.displayPage()
+                DHTMLpagenation.displayContent()
+            }
+            //显示当前页内容
+            DHTMLpagenation.displayContent = function () {
+                divDisplayContent.innerHTML = strDisplayContent
+            }
+
+            //改变每页的字节数
+            DHTMLpagenation.change = function () {
+                var iPerpageLength =
+                    document.getElementById("ctlPerpageLength").value
+                if (regularExp.test(iPerpageLength)) {
+                    //                DHTMLpagenation.perpageLength=iPerpageLength;
+                    //                DHTMLpagenation.currentPage=1;
+                    //                DHTMLpagenation.initialize();
+
+                    DHTMLpagenation(s, iPerpageLength)
+                } else {
+                    alert("请输入数字")
+                }
+            }
+
+            /*  currentArray:当前页以 * 分割后的数组
+            replaceCount:从开始内容到当前页的内容 * 的个数
+            matchArray ： img标签的匹配的内容
+        */
+            function replaceStr(currentArray, replaceCount, matchArray) {
+                var result = ""
+                for (
+                    var i = currentArray.length - 1, j = replaceCount - 1;
+                    i >= 1;
+                    i--
+                ) {
+                    var temp = matchArray[j] + currentArray[i]
+
+                    result = temp + result
+
+                    j--
+                }
+
+                result = currentArray[0] + result
+
+                return result
+            }
+
+            DHTMLpagenation(s, 100)
+        </script>
+    </body>
+</html>

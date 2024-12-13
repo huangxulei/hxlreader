@@ -198,6 +198,7 @@ const setStylesImportant = (el, styles) => {
 }
 
 class View {
+    //监视元素的大小变化
     #observer = new ResizeObserver(() => this.expand())
     #element = document.createElement('div')
     #iframe = document.createElement('iframe')
@@ -273,7 +274,9 @@ class View {
         })
     }
     render(layout) {
+        console.log("render")
         if (!layout) return
+        //是否页面显示一个html文件
         this.#column = layout.flow !== 'scrolled'
         this.#layout = layout
         if (this.#column) this.columnize(layout)
@@ -349,22 +352,40 @@ class View {
             })
         }
     }
+    //界面变化监控回调
     expand() {
         // this.#column = true 
         // this.#vertical false
         const { documentElement } = this.document//iframe 
         if (this.#column) {
+            // side = 'width'
             const side = this.#vertical ? 'height' : 'width'
             const otherSide = this.#vertical ? 'width' : 'height'
+            /**
+             * getBoundingClientRect()是一个原生的DOM方法，
+             * 它返回元素的大小及其相对于视口的位置。
+             * 这个返回的对象包含以下属性：
+                top: 元素上边缘距离视口上边的距离。
+                right: 元素右边缘距离视口右边的距离。
+                bottom: 元素下边缘距离视口上边的距离。
+                left: 元素左边缘距离视口左边的距离。
+                width: 元素的宽度（等同于right - left）。
+                height: 元素的高度（等同于bottom - top）。
+             */
             const contentRect = this.#contentRange.getBoundingClientRect()
             console.log("contentRect", contentRect)
             const rootRect = documentElement.getBoundingClientRect()
             console.log("rootRect", rootRect)
             // offset caused by column break at the start of the page
             // which seem to be supported only by WebKit and only for horizontal writing
+            // rtl 右向左, false 左向右 
+            // contentRect.left - rootRect.left 
             const contentStart = this.#vertical ? 0
                 : this.#rtl ? rootRect.right - contentRect.right : contentRect.left - rootRect.left
+            // const contentStart = contentRect.left - rootRect.left
             const contentSize = contentStart + contentRect[side]
+
+            console.log("contentStart ", contentStart, " contentSize", contentSize)
             const pageCount = Math.ceil(contentSize / this.#size)
             console.log("pageCount", pageCount)
             const expandedSize = pageCount * this.#size
@@ -421,7 +442,9 @@ export class Paginator extends HTMLElement {
         'flow', 'gap', 'margin',
         'max-inline-size', 'max-block-size', 'max-column-count',
     ]
+    // #Shadow-root
     #root = this.attachShadow({ mode: 'closed' })
+    //执行监听
     #observer = new ResizeObserver(() => this.render())
     #top
     #background
@@ -444,6 +467,7 @@ export class Paginator extends HTMLElement {
     #touchState
     #touchScrolled
     #lastVisibleRange
+    // 1, 执行
     constructor() {
         super()
         this.#root.innerHTML = `<style>
@@ -549,7 +573,7 @@ export class Paginator extends HTMLElement {
         this.#container = this.#root.getElementById('container')
         this.#header = this.#root.getElementById('header')
         this.#footer = this.#root.getElementById('footer')
-
+        // 2,执行 监听
         this.#observer.observe(this.#container)
         this.#container.addEventListener('scroll', () => this.dispatchEvent(new Event('scroll')))
         this.#container.addEventListener('scroll', debounce(() => {
@@ -637,6 +661,7 @@ export class Paginator extends HTMLElement {
                 break
         }
     }
+    //1, 把文件sections传递给view
     open(book) {
         this.bookDir = book.dir
         this.sections = book.sections
@@ -654,6 +679,7 @@ export class Paginator extends HTMLElement {
         return this.#view
     }
     #beforeRender({ vertical, rtl, background }) {
+        console.log("#beforeRender")
         this.#vertical = vertical
         this.#rtl = rtl
         this.#top.classList.toggle('vertical', vertical)
@@ -663,6 +689,7 @@ export class Paginator extends HTMLElement {
         this.#background.style.background = background
 
         const { width, height } = this.#container.getBoundingClientRect()
+        console.log("#container width height", width, height)
         const size = vertical ? height : width
 
         const style = getComputedStyle(this.#top)
@@ -730,8 +757,8 @@ export class Paginator extends HTMLElement {
         return { height, width, margin, gap, columnWidth }
     }
     render() {
-        console.log("paginator.js - render")
-        if (!this.#view) return
+        console.log("paginator.js - render")// #1
+        if (!this.#view) return //假如已经渲染 就不管了
         this.#view.render(this.#beforeRender({
             vertical: this.#vertical,
             rtl: this.#rtl,

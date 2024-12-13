@@ -241,24 +241,6 @@ export class View extends HTMLElement {
             || book.isDirectory) book = await makeBook(book)
         this.book = book
         this.language = languageInfo(book.metadata?.language)
-        /**
-         *  epub文件
-         *  splitTOCHref(href) { 
-         *      return href?.split('#') ?? []
-         *  }
-         *  getTOCFragment(doc, id) {
-         *     return doc.getElementById(id)?? doc.querySelector(`[name="${CSS.escape(id)}"]`)
-         *  }
-         *  mobi文件
-         *  splitTOCHref(href) { 
-         *      const pos = parsePosURI(href) 
-         *      const index = this.getIndexByFID(pos.fid)return [index, pos] 
-         *  }
-            getTOCFragment(doc, { fid, off }) {
-                const selector = this.#fragmentSelectors.get(fid)?.get(off)
-                return doc.querySelector(selector)
-            }
-         */
         if (book.splitTOCHref && book.getTOCFragment) {
             const ids = book.sections.map(s => s.id)
             //设置最下面进度条

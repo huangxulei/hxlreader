@@ -264,6 +264,7 @@ export class View extends HTMLElement {
             this.renderer = document.createElement('foliate-fxl')
         } else {
             await import('./ui/paginator.js')
+            // 定义 renderer
             this.renderer = document.createElement('foliate-paginator')
         }
         this.renderer.setAttribute('exportparts', 'head,foot,filter')
@@ -274,7 +275,7 @@ export class View extends HTMLElement {
         this.renderer.addEventListener('relocate', e => this.#onRelocate(e.detail))
         this.renderer.addEventListener('create-overlayer', e =>
             e.detail.attach(this.#createOverlayer(e.detail)))
-        this.renderer.open(book)//这里开始 Paginator
+        this.renderer.open(book)//01
         this.#root.append(this.renderer)
 
         if (book.sections.some(section => section.mediaOverlay)) {

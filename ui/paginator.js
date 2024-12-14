@@ -196,7 +196,7 @@ const setStylesImportant = (el, styles) => {
     const { style } = el
     for (const [k, v] of Object.entries(styles)) style.setProperty(k, v, 'important')
 }
-
+//#container div iframe
 class View {
     //监视元素的大小变化
     #observer = new ResizeObserver(() => this.expand())
@@ -274,7 +274,6 @@ class View {
         })
     }
     render(layout) {
-        console.log("render")
         if (!layout) return
         //是否页面显示一个html文件
         this.#column = layout.flow !== 'scrolled'
@@ -373,9 +372,7 @@ class View {
                 height: 元素的高度（等同于bottom - top）。
              */
             const contentRect = this.#contentRange.getBoundingClientRect()
-            console.log("contentRect", contentRect)
             const rootRect = documentElement.getBoundingClientRect()
-            console.log("rootRect", rootRect)
             // offset caused by column break at the start of the page
             // which seem to be supported only by WebKit and only for horizontal writing
             // rtl 右向左, false 左向右 
@@ -384,10 +381,7 @@ class View {
                 : this.#rtl ? rootRect.right - contentRect.right : contentRect.left - rootRect.left
             // const contentStart = contentRect.left - rootRect.left
             const contentSize = contentStart + contentRect[side]
-
-            console.log("contentStart ", contentStart, " contentSize", contentSize)
             const pageCount = Math.ceil(contentSize / this.#size)
-            console.log("pageCount", pageCount)
             const expandedSize = pageCount * this.#size
             this.#element.style.padding = '0'
             this.#iframe.style[side] = `${expandedSize}px`
@@ -442,9 +436,9 @@ export class Paginator extends HTMLElement {
         'flow', 'gap', 'margin',
         'max-inline-size', 'max-block-size', 'max-column-count',
     ]
-    // #Shadow-root
+    // #Shadow-root 附加到 Container 中
     #root = this.attachShadow({ mode: 'closed' })
-    //执行监听
+    //执行监听02
     #observer = new ResizeObserver(() => this.render())
     #top
     #background
@@ -662,7 +656,7 @@ export class Paginator extends HTMLElement {
         }
     }
     //1, 把文件sections传递给view
-    open(book) {
+    open(book) {//02
         this.bookDir = book.dir
         this.sections = book.sections
     }
@@ -675,11 +669,11 @@ export class Paginator extends HTMLElement {
             container: this,
             onExpand: () => this.#scrollToAnchor(this.#anchor),
         })
+        // 
         this.#container.append(this.#view.element)
         return this.#view
     }
     #beforeRender({ vertical, rtl, background }) {
-        console.log("#beforeRender")
         this.#vertical = vertical
         this.#rtl = rtl
         this.#top.classList.toggle('vertical', vertical)
@@ -689,7 +683,6 @@ export class Paginator extends HTMLElement {
         this.#background.style.background = background
 
         const { width, height } = this.#container.getBoundingClientRect()
-        console.log("#container width height", width, height)
         const size = vertical ? height : width
 
         const style = getComputedStyle(this.#top)
@@ -757,8 +750,7 @@ export class Paginator extends HTMLElement {
         return { height, width, margin, gap, columnWidth }
     }
     render() {
-        console.log("paginator.js - render")// #1
-        if (!this.#view) return //假如已经渲染 就不管了
+        if (!this.#view) return// view 不存在 undefined 不处理
         this.#view.render(this.#beforeRender({
             vertical: this.#vertical,
             rtl: this.#rtl,
@@ -974,11 +966,11 @@ export class Paginator extends HTMLElement {
         }
         this.dispatchEvent(new CustomEvent('relocate', { detail }))
     }
-    async #display(promise) {
+    async #display(promise) {//显示内容 08
         const { index, src, anchor, onLoad, select } = await promise
         this.#index = index
         const hasFocus = this.#view?.document?.hasFocus()
-        if (src) {
+        if (src) {//获取src
             const view = this.#createView()
             const afterLoad = doc => {
                 if (doc.head) {
@@ -1004,10 +996,11 @@ export class Paginator extends HTMLElement {
             ? anchor(this.#view.document) : anchor) ?? 0, select)
         if (hasFocus) this.focusView()
     }
-    #canGoToIndex(index) {
+    #canGoToIndex(index) {//判断index 是否在当前书籍的目录中 表示有这个章节 05
         return index >= 0 && index <= this.sections.length - 1
     }
-    async #goTo({ index, anchor, select }) {
+    async #goTo({ index, anchor, select }) {//0, ()=>0, null
+        // 1===-1 false
         if (index === this.#index) await this.#display({ index, anchor, select })
         else {
             const oldIndex = this.#index
@@ -1016,6 +1009,9 @@ export class Paginator extends HTMLElement {
                 this.setStyles(this.#styles)
                 this.dispatchEvent(new CustomEvent('load', { detail }))
             }
+            //06 sections[0].load() 
+            // () => this.#loader.loadItem(item)
+            // async loadItem
             await this.#display(Promise.resolve(this.sections[index].load())
                 .then(src => ({ index, src, anchor, onLoad, select }))
                 .catch(e => {
@@ -1059,18 +1055,22 @@ export class Paginator extends HTMLElement {
     get atEnd() {
         return this.#adjacentIndex(1) == null && this.page >= this.pages - 2
     }
-    #adjacentIndex(dir) {
+    #adjacentIndex(dir) {//dir = 1 校正index 
+        // index = 0; true, index += 1
         for (let index = this.#index + dir; this.#canGoToIndex(index); index += dir)
+            // sections[0].linear = null => true 
             if (this.sections[index]?.linear !== 'no') return index
     }
-    async #turnPage(dir, distance) {
+    async #turnPage(dir, distance) {//04 (1, null)
         if (this.#locked) return
         this.#locked = true
-        const prev = dir === -1 //dir=1 prev false
+        const prev = dir === -1 //false
+        // this.#scrollNext(distance) 
         const shouldGo = await (prev ? this.#scrollPrev(distance) : this.#scrollNext(distance))
-        if (shouldGo) await this.#goTo({
-            index: this.#adjacentIndex(dir),
-            anchor: prev ? () => 1 : () => 0,
+        // shouldGo = true
+        if (shouldGo) await this.#goTo({//04
+            index: this.#adjacentIndex(dir),//返回index
+            anchor: prev ? () => 1 : () => 0,// 锚点 () => 0
         })
         if (shouldGo || !this.hasAttribute('animated')) await wait(100)
         this.#locked = false
@@ -1078,7 +1078,7 @@ export class Paginator extends HTMLElement {
     prev(distance) {
         return this.#turnPage(-1, distance)
     }
-    next(distance) {
+    next(distance) {//03
         return this.#turnPage(1, distance)
     }
     prevSection() {

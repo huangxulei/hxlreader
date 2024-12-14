@@ -60,7 +60,7 @@ const formatOneContributor = contributor => typeof contributor === 'string'
 const formatContributor = contributor => Array.isArray(contributor)
     ? listFormat.format(contributor.map(formatOneContributor))
     : formatOneContributor(contributor)
-
+//文件读写
 class Reader {
     #tocView//目录页面
     style = {
@@ -109,8 +109,9 @@ class Reader {
             menu.element.classList.toggle('show'))
         menu.groups.layout.select('paginated')
     }
+    // 打开文件
     async open(file) {
-        //显示内容页面
+        //创建显示布局
         this.view = document.createElement('foliate-view')
         document.body.append(this.view)
         await this.view.open(file)
@@ -119,7 +120,7 @@ class Reader {
 
         const { book } = this.view
         this.view.renderer.setStyles?.(getCSS(this.style))
-        this.view.renderer.next()
+        this.view.renderer.next()//03
 
         $('#header-bar').style.visibility = 'visible'
         $('#nav-bar').style.visibility = 'visible'
@@ -214,7 +215,6 @@ class Reader {
 const open = async file => {
     //移除添加文件的布局
     document.body.removeChild($('#drop-target'))
-
     const reader = new Reader()
     globalThis.reader = reader
     await reader.open(file)

@@ -715,9 +715,11 @@ class Loader {
         //.filter(({ mediaType }) => ![MIME.XHTML, MIME.HTML].includes(mediaType))
     }
     createURL(href, data, type, parent) {
+        console.log(href, data, type, parent)
         if (!data) return ''
         const url = URL.createObjectURL(new Blob([data], { type }))
         this.#cache.set(href, url)
+        console.log(href, url)
         this.#refCount.set(href, 1)
         if (parent) {
             const childList = this.#children.get(parent)
@@ -739,9 +741,7 @@ class Loader {
     unref(href) {
         if (!this.#refCount.has(href)) return
         const count = this.#refCount.get(href) - 1
-        //console.log(`unreferencing ${href}, now ${count}`)
         if (count < 1) {
-            //console.log(`unloading ${href}`)
             URL.revokeObjectURL(this.#cache.get(href))
             this.#cache.delete(href)
             this.#refCount.delete(href)
@@ -752,7 +752,17 @@ class Loader {
         } else this.#refCount.set(href, count)
     }
     // load manifest item, recursively loading all resources as needed
+    // 07 返回一个url
     async loadItem(item, parents = []) {
+        /**
+         * {
+            "href": "text/part0009.html",
+            "id": "id28",
+            "mediaType": "application/xhtml+xml",
+            "mediaOverlay": null
+            }
+         */
+        console.log("epub loadItem(item) item=", item)
         if (!item) return null
         const { href, mediaType } = item
 

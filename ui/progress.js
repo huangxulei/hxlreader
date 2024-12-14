@@ -69,7 +69,6 @@ export class SectionProgress {
         //总大小
         this.sizeTotal = this.sizes.reduce((a, b) => a + b, 0)
         this.sectionFractions = this.#getSectionFractions()
-        // console.log(this.sectionFractions)
     }
     // a = [1,2,3,4] [0.1,0.3,0.6,]
     #getSectionFractions() {
@@ -81,7 +80,6 @@ export class SectionProgress {
     }
     // get progress given index of and fractions within a section
     getProgress(index, fractionInSection, pageFraction = 0) {
-        // console.log("getProgress", index, fractionInSection, pageFraction)
         const { sizes, sizePerLoc, sizePerTimeUnit, sizeTotal } = this
         const sizeInSection = sizes[index] ?? 0
         const sizeBefore = sizes.slice(0, index).reduce((a, b) => a + b, 0)

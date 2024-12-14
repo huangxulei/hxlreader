@@ -11,18 +11,37 @@
 
 </body>
 <script>
-    const MIME = {
-        XML: 'application/xml',
-        NCX: 'application/x-dtbncx+xml',
-        XHTML: 'application/xhtml+xml',
-        HTML: 'text/html',
-        CSS: 'text/css',
-        SVG: 'image/svg+xml',
-        JS: /\/(x-)?(javascript|ecmascript)/,
+
+    // function dog() {
+    //     console.log(this.name)
+    // }
+    let dog = {
+        name: "旺财",
+        sayName() {
+            console.log("我是", this.name)
+        },
+        eat(food1, food2) {
+            console.log("我喜欢吃", food1, food2)
+        }
     }
 
-    const isScript = MIME.JS.test("application/xhtml+xml")
-    console.log(isScript)
+    let cat = {
+        name: "喵喵"
+    }
+
+    // dog.sayName.call(cat)
+
+    // dog.sayName.apply(cat)
+
+    // dog.eat("骨头")
+
+    //dog.eat.call(cat, "骨头", "鱼")
+    // dog.eat.apply(cat, ["骨头", "鱼"])
+
+    let eat = dog.eat.bind(cat, "骨头", "鱼")
+
+    eat()
+
 </script>
 
 </html>

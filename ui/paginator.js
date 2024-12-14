@@ -241,7 +241,15 @@ class View {
     get document() {
         return this.#iframe.contentDocument
     }
-    async load(src, afterLoad, beforeRender) {
+    /**
+     * 
+     * @param {*} src 文件路径
+     * @param {*} afterLoad 
+     * @param {*} beforeRender 
+     * @returns 
+     */
+    async load(src, afterLoad, beforeRender) {//08*
+        console.log("src" + src, "<br/> afterLoad" + afterLoad, "beforeRender <br/> " + beforeRender)
         if (typeof src !== 'string') throw new Error(`${src} is not string`)
         return new Promise(resolve => {
             this.#iframe.addEventListener('load', () => {
@@ -967,11 +975,12 @@ export class Paginator extends HTMLElement {
         this.dispatchEvent(new CustomEvent('relocate', { detail }))
     }
     async #display(promise) {//显示内容 08
+        // 序列号 index 文件路径 src, 锚点 anchor 执行函数 onLoad, 
         const { index, src, anchor, onLoad, select } = await promise
         this.#index = index
         const hasFocus = this.#view?.document?.hasFocus()
         if (src) {//获取src
-            const view = this.#createView()
+            const view = this.#createView()// 创建布局
             const afterLoad = doc => {
                 if (doc.head) {
                     const $styleBefore = doc.createElement('style')
@@ -983,7 +992,7 @@ export class Paginator extends HTMLElement {
                 onLoad?.({ doc, index })
             }
             const beforeRender = this.#beforeRender.bind(this)
-            await view.load(src, afterLoad, beforeRender)
+            await view.load(src, afterLoad, beforeRender)// 文件, 两个函数
             this.dispatchEvent(new CustomEvent('create-overlayer', {
                 detail: {
                     doc: view.document, index,
@@ -992,6 +1001,7 @@ export class Paginator extends HTMLElement {
             }))
             this.#view = view
         }
+        //有锚点就滚动到锚点
         await this.scrollToAnchor((typeof anchor === 'function'
             ? anchor(this.#view.document) : anchor) ?? 0, select)
         if (hasFocus) this.focusView()

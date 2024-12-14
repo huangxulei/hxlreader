@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+
+    let src = "blob:http://localhost:3000/099445db-d3ff-4aa6-8a3e-d53d1d0cfaa3"
+    let iframe = document.getElementById("ifr")
+    iframe.src = src
+
+    function load() {
+        return new Promise(resolve => {
+
+        });
+    }
+
+</script>
+
+<body>
+    <div id="container">
+        <iframe id="ifr">
+
+        </iframe>
+    </div>
+</body>
+
+</html>

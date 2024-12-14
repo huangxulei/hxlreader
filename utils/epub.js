@@ -715,11 +715,10 @@ class Loader {
         //.filter(({ mediaType }) => ![MIME.XHTML, MIME.HTML].includes(mediaType))
     }
     createURL(href, data, type, parent) {
-        console.log(href, data, type, parent)
+        console.log("href=" + href, "data =" + data, "type=" + type, "parent=" + parent)
         if (!data) return ''
         const url = URL.createObjectURL(new Blob([data], { type }))
         this.#cache.set(href, url)
-        console.log(href, url)
         this.#refCount.set(href, 1)
         if (parent) {
             const childList = this.#children.get(parent)
